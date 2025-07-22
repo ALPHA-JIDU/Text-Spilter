@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Splitter by ALPHA JIDU</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #fafafa;
+            --card-bg: #ffffff;
+            --text: #1a1a1a;
+            --text-light: #666666;
+            --border: #e0e0e0;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #059669;
+            --success-hover: #047857;
+            --orange: #ea580c;
+            --orange-hover: #c2410c;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0f0f0f;
+                --card-bg: #1a1a1a;
+                --text: #ffffff;
+                --text-light: #a3a3a3;
+                --border: #333333;
+                --primary: #3b82f6;
+                --primary-hover: #2563eb;
+                --success: #10b981;
+                --success-hover: #059669;
+                --orange: #f97316;
+                --orange-hover: #ea580c;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .input-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            max-height: 400px;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--card-bg);
+            color: var(--text);
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        textarea::placeholder {
+            color: var(--text-light);
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        select, input[type="number"] {
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--card-bg);
+            color: var(--text);
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        input[type="number"] {
+            width: 100px;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: var(--success-hover);
+        }
+
+        .btn-orange {
+            background: var(--orange);
+            color: white;
+        }
+
+        .btn-orange:hover {
+            background: var(--orange-hover);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 12px;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .stats {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .part {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .part-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .part-title {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .part-stats {
+            color: var(--text-light);
+            font-size: 12px;
+        }
+
+        .part-content {
+            padding: 1.5rem;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 300px;
+            overflow-y: auto;
+            background: var(--bg);
+        }
+
+        .toast {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            background: #dc2626;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .input-card {
+                padding: 1.5rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .control-group {
+                width: 100%;
+            }
+
+            input[type="number"] {
+                width: 100%;
+            }
+
+            .results-header {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .part-header {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Text Splitter</h1>
+            <p>Split any text into manageable parts</p>
+        </div>
+
+        <div class="input-card">
+            <div class="form-group">
+                <label for="textInput">Your Text</label>
+                <textarea id="textInput" placeholder="Paste your text, code, or any content here..."></textarea>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label for="splitMode">Split Mode</label>
+                    <select id="splitMode" onchange="toggleMode()">
+                        <option value="chars">By Character Limit</option>
+                        <option value="parts">Into Equal Parts</option>
+                    </select>
+                </div>
+
+                <div class="control-group" id="charControl">
+                    <label for="charLimit">Characters per Part</label>
+                    <input type="number" id="charLimit" value="2000" min="100" max="10000">
+                </div>
+
+                <div class="control-group" id="partControl" style="display: none;">
+                    <label for="partCount">Number of Parts</label>
+                    <input type="number" id="partCount" value="5" min="2" max="20">
+                </div>
+
+                <button class="btn btn-primary" onclick="splitText()">
+                    <i class="fas fa-cut"></i>
+                    Split Text
+                </button>
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <div class="results-header">
+                <div class="stats" id="stats"></div>
+                <button class="btn btn-orange" onclick="copyAll()">
+                    <i class="fas fa-copy"></i>
+                    Copy All
+                </button>
+            </div>
+            <div id="partsContainer"></div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <i class="fas fa-check"></i>
+        <span id="toastText">Copied!</span>
+    </div>
+
+    <script>
+        let parts = [];
+
+        function toggleMode() {
+            const mode = document.getElementById('splitMode').value;
+            const charControl = document.getElementById('charControl');
+            const partControl = document.getElementById('partControl');
+
+            if (mode === 'chars') {
+                charControl.style.display = 'flex';
+                partControl.style.display = 'none';
+            } else {
+                charControl.style.display = 'none';
+                partControl.style.display = 'flex';
+            }
+        }
+
+        function splitText() {
+            const text = document.getElementById('textInput').value;
+            const mode = document.getElementById('splitMode').value;
+
+            if (!text.trim()) {
+                showToast('Please enter some text', true);
+                return;
+            }
+
+            parts = [];
+
+            if (mode === 'chars') {
+                splitByChars(text);
+            } else {
+                splitByParts(text);
+            }
+
+            displayResults();
+        }
+
+        function splitByChars(text) {
+            const limit = parseInt(document.getElementById('charLimit').value);
+            let index = 0;
+            let partNum = 1;
+
+            while (index < text.length) {
+                const chunk = text.substring(index, index + limit);
+                parts.push({
+                    number: partNum++,
+                    content: chunk,
+                    chars: chunk.length,
+                    words: countWords(chunk)
+                });
+                index += limit;
+            }
+        }
+
+        function splitByParts(text) {
+            const count = parseInt(document.getElementById('partCount').value);
+            const chunkSize = Math.ceil(text.length / count);
+
+            for (let i = 0; i < count; i++) {
+                const start = i * chunkSize;
+                const end = Math.min(start + chunkSize, text.length);
+                const chunk = text.substring(start, end);
+
+                if (chunk.length > 0) {
+                    parts.push({
+                        number: i + 1,
+                        content: chunk,
+                        chars: chunk.length,
+                        words: countWords(chunk)
+                    });
+                }
+            }
+        }
+
+        function countWords(text) {
+            // Simple character-based word counting that works for any text type
+            return text.trim() ? text.trim().split(/\s+/).length : 0;
+        }
+
+        function displayResults() {
+            const results = document.getElementById('results');
+            const stats = document.getElementById('stats');
+            const container = document.getElementById('partsContainer');
+
+            const totalChars = parts.reduce((sum, part) => sum + part.chars, 0);
+            const totalWords = parts.reduce((sum, part) => sum + part.words, 0);
+
+            stats.innerHTML = `${parts.length} parts • ${totalChars.toLocaleString()} characters • ${totalWords.toLocaleString()} words`;
+
+            container.innerHTML = '';
+
+            parts.forEach(part => {
+                const partDiv = document.createElement('div');
+                partDiv.className = 'part';
+                partDiv.innerHTML = `
+                    <div class="part-header">
+                        <div class="part-title">Part ${part.number}</div>
+                        <div class="part-stats">${part.chars} chars • ${part.words} words</div>
+                        <button class="btn btn-success btn-sm" onclick="copyPart(${part.number - 1})">
+                            <i class="fas fa-copy"></i>
+                            Copy
+                        </button>
+                    </div>
+                    <div class="part-content"></div>
+                `;
+                container.appendChild(partDiv);
+                
+                // Safely insert text content without HTML interpretation
+                const contentDiv = partDiv.querySelector('.part-content');
+                contentDiv.textContent = part.content;
+            });
+
+            results.style.display = 'block';
+            showToast(`Split into ${parts.length} parts`);
+        }
+
+        function copyPart(index) {
+            const part = parts[index];
+            copyToClipboard(part.content, `Part ${part.number} copied`);
+        }
+
+        function copyAll() {
+            const allText = parts.map(part => `--- Part ${part.number} ---\n${part.content}`).join('\n\n');
+            copyToClipboard(allText, 'All parts copied');
+        }
+
+        function copyToClipboard(text, successMessage) {
+            // Try modern clipboard API first
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast(successMessage);
+                }).catch(() => {
+                    fallbackCopy(text, successMessage);
+                });
+            } else {
+                fallbackCopy(text, successMessage);
+            }
+        }
+
+        function fallbackCopy(text, successMessage) {
+            // Fallback method for older browsers or non-secure contexts
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast(successMessage);
+                } else {
+                    showToast('Copy failed - please select and copy manually', true);
+                }
+            } catch (err) {
+                showToast('Copy failed - please select and copy manually', true);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const text = document.getElementById('toastText');
+            
+            text.textContent = message;
+            toast.className = `toast ${isError ? 'error' : ''}`;
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Auto-resize textarea
+        document.getElementById('textInput').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(400, Math.max(200, this.scrollHeight)) + 'px';
+        });
+    </script></body>
+</html>
